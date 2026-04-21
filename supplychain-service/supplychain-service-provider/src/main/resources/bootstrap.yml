@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: supplychain-service-provider
+  config:
+    import:
+      - optional:nacos:datasource.yml
+      - optional:nacos:redis.yml
+      - optional:nacos:mybatis-plus.yml
+      - optional:nacos:dubbo-provider.yml
+      - optional:nacos:elasticsearch.yml
+      - optional:nacos:jwt.yml
+      - optional:nacos:management.yml
+      - optional:nacos:${spring.application.name}.yml
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${SUPPLYCHAIN_NACOS_ADDR:127.0.0.1:8848}
+        username: ${SUPPLYCHAIN_NACOS_USERNAME:nacos}
+        password: ${SUPPLYCHAIN_NACOS_PASSWORD:nacos}
+        namespace: ${SUPPLYCHAIN_NACOS_NAMESPACE:supplychain_local}
+        group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+      config:
+        server-addr: ${SUPPLYCHAIN_NACOS_ADDR:127.0.0.1:8848}
+        username: ${SUPPLYCHAIN_NACOS_USERNAME:nacos}
+        password: ${SUPPLYCHAIN_NACOS_PASSWORD:nacos}
+        namespace: ${SUPPLYCHAIN_NACOS_NAMESPACE:supplychain_local}
+        group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+        file-extension: yml

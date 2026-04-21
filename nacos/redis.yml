@@ -1,0 +1,8 @@
+spring:
+  data:
+    redis:
+      host: ${SUPPLYCHAIN_REDIS_HOST:127.0.0.1}
+      port: ${SUPPLYCHAIN_REDIS_PORT:6379}
+      password: ${SUPPLYCHAIN_REDIS_PASSWORD:}
+      database: ${SUPPLYCHAIN_REDIS_DATABASE:0}
+      timeout: 3s

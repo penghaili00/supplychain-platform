@@ -1,0 +1,113 @@
+# Docker Compose配置文件 - SupplyChain项目基础设施服务
+# 包含MySQL、Redis、Elasticsearch、Nacos、RabbitMQ五个核心中间件服务
+services:
+  # MySQL 8.0数据库服务配置
+  mysql:
+    env_file:
+      - ./deploy/env/local.env
+    image: mysql:8.0.36
+    container_name: supplychain-mysql
+    # 设置认证插件、字符集和排序规则
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    # 环境变量：root密码、默认数据库、时区（支持通过环境变量覆盖，提供默认值）
+    environment:
+      MYSQL_ROOT_PASSWORD: ${SUPPLYCHAIN_MYSQL_PASSWORD:-123456}
+      MYSQL_DATABASE: ${SUPPLYCHAIN_MYSQL_DATABASE:-supplychain}
+      TZ: Asia/Shanghai
+    # 端口映射：宿主机端口可配置，默认3306
+    ports:
+      - "${SUPPLYCHAIN_MYSQL_PORT:-3306}:3306"
+    # 数据持久化卷挂载
+    volumes:
+      - supplychain_mysql_data:/var/lib/mysql
+    # 健康检查：每10秒检测一次，超时5秒，最多重试12次
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # Redis 7.2缓存服务配置（Alpine精简版）
+  redis:
+    env_file:
+      - ./deploy/env/local.env
+    image: redis:7.2-alpine
+    container_name: supplychain-redis
+    # 启用AOF持久化模式
+    command: ["redis-server", "--appendonly", "yes"]
+    # 端口映射：默认6379
+    ports:
+      - "${SUPPLYCHAIN_REDIS_PORT:-6379}:6379"
+    # 数据持久化卷挂载
+    volumes:
+      - supplychain_redis_data:/data
+
+  # Elasticsearch 8.x 搜索服务配置（单节点模式，开启认证）
+  elasticsearch:
+    env_file:
+      - ./deploy/env/local.env
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: supplychain-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "true"
+      ELASTIC_PASSWORD: ${SUPPLYCHAIN_ES_PASSWORD:-elastic}
+      ES_JAVA_OPTS: ${SUPPLYCHAIN_ES_JAVA_OPTS:--Xms512m -Xmx512m}
+    ports:
+      - "9200:9200"
+    volumes:
+      - supplychain_es_data:/usr/share/elasticsearch/data
+
+  # Nacos 2.3.2服务发现与配置中心（单机模式）
+  nacos:
+    env_file:
+      - ./deploy/env/local.env
+    image: nacos/nacos-server:v2.3.2
+    container_name: supplychain-nacos
+    # 配置项：单机模式、启用认证、身份验证密钥和令牌、JVM内存参数
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLE: "true"
+      NACOS_AUTH_IDENTITY_KEY: serverIdentity
+      NACOS_AUTH_IDENTITY_VALUE: security
+      NACOS_AUTH_TOKEN: ${SUPPLYCHAIN_NACOS_AUTH_TOKEN:-SupplyChainNacosServerIdentityToken2026}
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+      JVM_XMN: 256m
+    # 端口映射：HTTP服务(8848)、gRPC服务(9848)、gRPC TLS(9849)
+    ports:
+      - "${SUPPLYCHAIN_NACOS_HTTP_PORT:-8848}:8848"
+      - "${SUPPLYCHAIN_NACOS_GRPC_PORT:-9848}:9848"
+      - "${SUPPLYCHAIN_NACOS_GRPC_TLS_PORT:-9849}:9849"
+    # 日志持久化卷挂载
+    volumes:
+      - supplychain_nacos_logs:/home/nacos/logs
+
+  # RabbitMQ 3.13消息队列服务（带管理界面）
+  rabbitmq:
+    env_file:
+      - ./deploy/env/local.env
+    image: rabbitmq:3.13-management
+    container_name: supplychain-rabbitmq
+    # 默认用户和密码配置（支持环境变量覆盖）
+    environment:
+      RABBITMQ_DEFAULT_USER: ${SUPPLYCHAIN_RABBITMQ_USERNAME:-guest}
+      RABBITMQ_DEFAULT_PASS: ${SUPPLYCHAIN_RABBITMQ_PASSWORD:-guest}
+    # 端口映射：AMQP协议(5672)、管理界面HTTP(15672)
+    ports:
+      - "${SUPPLYCHAIN_RABBITMQ_AMQP_PORT:-5672}:5672"
+      - "${SUPPLYCHAIN_RABBITMQ_HTTP_PORT:-15672}:15672"
+    # 数据持久化卷挂载
+    volumes:
+      - supplychain_rabbitmq_data:/var/lib/rabbitmq
+
+# 定义所有服务使用的命名数据卷（用于持久化存储）
+volumes:
+  supplychain_mysql_data:
+  supplychain_redis_data:
+  supplychain_es_data:
+  supplychain_nacos_logs:
+  supplychain_rabbitmq_data:

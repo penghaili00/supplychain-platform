@@ -1,0 +1,28 @@
+server:
+  port: ${SUPPLYCHAIN_GATEWAY_PORT:9000}
+
+spring:
+  cloud:
+    gateway:
+      forwarded:
+        enabled: false
+      x-forwarded:
+        enabled: false
+      routes:
+        - id: supplychain-admin
+          uri: lb://supplychain-admin
+          predicates:
+            - Path=/admin/**
+        - id: supplychain-api
+          uri: lb://supplychain-api
+          predicates:
+            - Path=/api/**
+
+supplychain:
+  gateway:
+    ignore-urls:
+      - /admin/auth/login
+      - /admin/auth/refresh
+      - /api/auth/login
+      - /api/auth/refresh
+      - /actuator/**

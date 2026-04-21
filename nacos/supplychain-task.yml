@@ -1,0 +1,6 @@
+server:
+  port: ${SUPPLYCHAIN_TASK_PORT:8083}
+
+supplychain:
+  task:
+    demo-cron: ${SUPPLYCHAIN_TASK_DEMO_CRON:0 0/5 * * * ?}

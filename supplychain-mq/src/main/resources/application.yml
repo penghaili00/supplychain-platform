@@ -1,0 +1,35 @@
+server:
+  port: 8084
+
+spring:
+  cloud:
+    service-registry:
+      auto-registration:
+        enabled: false
+    nacos:
+      discovery:
+        enabled: false
+        register-enabled: false
+        server-addr: ${SUPPLYCHAIN_NACOS_ADDR:127.0.0.1:8848}
+        username: ${SUPPLYCHAIN_NACOS_USERNAME:nacos}
+        password: ${SUPPLYCHAIN_NACOS_PASSWORD:nacos}
+        namespace: ${SUPPLYCHAIN_NACOS_NAMESPACE:supplychain_local}
+        group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+  rabbitmq:
+    host: ${SUPPLYCHAIN_RABBITMQ_HOST:127.0.0.1}
+    port: ${SUPPLYCHAIN_RABBITMQ_PORT:5672}
+    username: ${SUPPLYCHAIN_RABBITMQ_USERNAME:guest}
+    password: ${SUPPLYCHAIN_RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        missing-queues-fatal: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+supplychain:
+  rabbitmq:
+    enabled: false

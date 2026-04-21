@@ -1,0 +1,53 @@
+server:
+  port: 9000
+
+spring:
+  cloud:
+    service-registry:
+      auto-registration:
+        enabled: false
+    nacos:
+      discovery:
+        enabled: false
+        register-enabled: false
+        server-addr: ${SUPPLYCHAIN_NACOS_ADDR:127.0.0.1:8848}
+        username: ${SUPPLYCHAIN_NACOS_USERNAME:nacos}
+        password: ${SUPPLYCHAIN_NACOS_PASSWORD:nacos}
+        namespace: ${SUPPLYCHAIN_NACOS_NAMESPACE:supplychain_local}
+        group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+    gateway:
+      forwarded:
+        enabled: false
+      x-forwarded:
+        enabled: false
+      routes:
+        - id: supplychain-admin
+          uri: http://127.0.0.1:${SUPPLYCHAIN_ADMIN_PORT:8081}
+          predicates:
+            - Path=/admin/**
+        - id: supplychain-api
+          uri: http://127.0.0.1:${SUPPLYCHAIN_API_PORT:8082}
+          predicates:
+            - Path=/api/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+supplychain:
+  security:
+    jwt:
+      issuer: supplychain
+      secret: ${SUPPLYCHAIN_JWT_SECRET:SupplyChain-Default-Jwt-Secret-Please-Change-Now-2026}
+      access-expire: 30m
+      refresh-expire: 7d
+      single-login: true
+  gateway:
+    ignore-urls:
+      - /admin/auth/login
+      - /admin/auth/refresh
+      - /api/auth/login
+      - /api/auth/refresh
+      - /actuator/**

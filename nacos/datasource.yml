@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://${SUPPLYCHAIN_MYSQL_HOST:127.0.0.1}:${SUPPLYCHAIN_MYSQL_PORT:3306}/${SUPPLYCHAIN_MYSQL_DATABASE:supplychain}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${SUPPLYCHAIN_MYSQL_USERNAME:root}
+    password: ${SUPPLYCHAIN_MYSQL_PASSWORD:123456}
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      validation-query: select 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false

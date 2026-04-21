@@ -1,0 +1,33 @@
+server:
+  port: ${SUPPLYCHAIN_SERVICE_PROVIDER_PORT:8090}
+
+spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations: classpath:db/migration
+
+supplychain:
+  security:
+    app-auth:
+      sign-secret: ${SUPPLYCHAIN_APP_SIGN_SECRET:SupplyChain-App-Sign-Secret-Please-Change-Now-2026}
+      allowed-timestamp-skew: 5m
+      nonce-ttl: 5m
+      password:
+        iterations: 120000
+        hash-bytes: 32
+      account-failure-rules:
+        - window: 30m
+          threshold: 5
+          lock-duration: 10m
+        - window: 2h
+          threshold: 15
+          lock-duration: 1h
+        - window: 1d
+          threshold: 20
+          lock-duration: 1d
+      ip-failure-rules:
+        - window: 1d
+          threshold: 30
+          lock-duration: 1d

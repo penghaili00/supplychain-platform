@@ -1,0 +1,5 @@
+supplychain:
+  elasticsearch:
+    base-url: ${SUPPLYCHAIN_ES_URL:http://127.0.0.1:9200}
+    username: ${SUPPLYCHAIN_ES_USERNAME:elastic}
+    password: ${SUPPLYCHAIN_ES_PASSWORD:}

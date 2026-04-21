@@ -1,0 +1,2 @@
+server:
+  port: ${SUPPLYCHAIN_ADMIN_PORT:8081}

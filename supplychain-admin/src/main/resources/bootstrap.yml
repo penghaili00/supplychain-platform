@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: supplychain-admin
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${SUPPLYCHAIN_NACOS_ADDR:127.0.0.1:8848}
+        username: ${SUPPLYCHAIN_NACOS_USERNAME:nacos}
+        password: ${SUPPLYCHAIN_NACOS_PASSWORD:nacos}
+        namespace: ${SUPPLYCHAIN_NACOS_NAMESPACE:supplychain_local}
+        group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+      config:
+        server-addr: ${SUPPLYCHAIN_NACOS_ADDR:127.0.0.1:8848}
+        username: ${SUPPLYCHAIN_NACOS_USERNAME:nacos}
+        password: ${SUPPLYCHAIN_NACOS_PASSWORD:nacos}
+        namespace: ${SUPPLYCHAIN_NACOS_NAMESPACE:supplychain_local}
+        group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+        file-extension: yml
+        shared-configs:
+          - data-id: redis.yml
+            group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+            refresh: true
+          - data-id: dubbo-consumer.yml
+            group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+            refresh: true
+          - data-id: jwt.yml
+            group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+            refresh: true
+          - data-id: management.yml
+            group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+            refresh: true
+        extension-configs:
+          - data-id: ${spring.application.name}.yml
+            group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+            refresh: true

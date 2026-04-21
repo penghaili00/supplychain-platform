@@ -1,0 +1,16 @@
+server:
+  port: ${SUPPLYCHAIN_MQ_PORT:8084}
+
+spring:
+  rabbitmq:
+    host: ${SUPPLYCHAIN_RABBITMQ_HOST:127.0.0.1}
+    port: ${SUPPLYCHAIN_RABBITMQ_PORT:5672}
+    username: ${SUPPLYCHAIN_RABBITMQ_USERNAME:guest}
+    password: ${SUPPLYCHAIN_RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        missing-queues-fatal: false
+
+supplychain:
+  rabbitmq:
+    enabled: ${SUPPLYCHAIN_RABBITMQ_ENABLED:false}

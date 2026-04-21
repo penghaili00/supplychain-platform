@@ -1,0 +1,55 @@
+server:
+  port: 8081
+
+spring:
+  cloud:
+    service-registry:
+      auto-registration:
+        enabled: false
+    nacos:
+      discovery:
+        enabled: false
+        register-enabled: false
+        server-addr: ${SUPPLYCHAIN_NACOS_ADDR:127.0.0.1:8848}
+        username: ${SUPPLYCHAIN_NACOS_USERNAME:nacos}
+        password: ${SUPPLYCHAIN_NACOS_PASSWORD:nacos}
+        namespace: ${SUPPLYCHAIN_NACOS_NAMESPACE:supplychain_local}
+        group: ${SUPPLYCHAIN_NACOS_GROUP:DEFAULT_GROUP}
+  data:
+    redis:
+      host: ${SUPPLYCHAIN_REDIS_HOST:127.0.0.1}
+      port: ${SUPPLYCHAIN_REDIS_PORT:6379}
+      password: ${SUPPLYCHAIN_REDIS_PASSWORD:}
+      database: ${SUPPLYCHAIN_REDIS_DATABASE:0}
+      timeout: 3s
+
+dubbo:
+  application:
+    name: ${spring.application.name}
+    qos-enable: false
+  registry:
+    address: nacos://${SUPPLYCHAIN_NACOS_ADDR:127.0.0.1:8848}
+    username: ${SUPPLYCHAIN_NACOS_USERNAME:nacos}
+    password: ${SUPPLYCHAIN_NACOS_PASSWORD:nacos}
+    file: ${user.dir}/.dubbo/${spring.application.name}-registry.cache
+    use-as-config-center: false
+    use-as-metadata-center: false
+  consumer:
+    check: false
+    timeout: 5000
+    retries: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+supplychain:
+  security:
+    jwt:
+      issuer: supplychain
+      secret: ${SUPPLYCHAIN_JWT_SECRET:SupplyChain-Default-Jwt-Secret-Please-Change-Now-2026}
+      access-expire: 30m
+      refresh-expire: 7d
+      single-login: true

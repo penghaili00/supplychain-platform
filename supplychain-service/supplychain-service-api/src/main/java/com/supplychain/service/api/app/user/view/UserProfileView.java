@@ -1,4 +1,4 @@
-package com.supplychain.service.api.dto;
+package com.supplychain.service.api.app.user.view;
 
 import com.supplychain.common.core.enums.DataScopeType;
 import com.supplychain.common.core.enums.UserType;

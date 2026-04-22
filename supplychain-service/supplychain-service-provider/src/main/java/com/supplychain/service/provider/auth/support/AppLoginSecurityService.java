@@ -2,7 +2,7 @@ package com.supplychain.service.provider.auth.support;
 
 import com.supplychain.common.core.exception.BizException;
 import com.supplychain.common.core.exception.UnauthorizedException;
-import com.supplychain.service.api.dto.AppLoginCommand;
+import com.supplychain.service.api.app.user.command.AppLoginCommand;
 import com.supplychain.service.provider.auth.config.AppAuthSecurityProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

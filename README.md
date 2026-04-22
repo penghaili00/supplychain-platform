@@ -1,25 +1,60 @@
-# SupplyChain
+# SupplyChain Platform
 
-SupplyChain 是一个基于 `JDK 21 + Spring Boot 3 + Spring Cloud Alibaba + Dubbo + MyBatis-Plus + Redis + MySQL + RabbitMQ + Nacos` 的微服务脚手架项目，当前已经完成后台端与 App 端基础链路、统一网关、Dubbo 服务拆分、纯 Nacos 配置管理，以及 App 端独立用户体系与登录风控骨架。
+SupplyChain Platform 是一个面向企业采购场景的 `B2B 供应链订单履约平台`。项目以 `客户下单 -> 订单审核 -> 锁库存 -> 分仓发货 -> 确认收货 -> 对账结算 -> 售后处理 -> 采购补货` 为长期业务主链，当前阶段聚焦一期建设，优先打通真实可演示的订单履约闭环。
+
+系统基于 `JDK 21 + Spring Boot 3 + Spring Cloud Alibaba + Dubbo + MyBatis-Plus + Redis + MySQL + RabbitMQ + Nacos` 构建，采用 `gateway + admin + api + service-provider + task + mq` 的微服务结构，服务采购客户、运营、仓库、财务和采购等多角色协同场景。
 
 ## 项目定位
 
-- 面向后台管理端和 App 端的双端微服务基础工程
-- 使用 `gateway + admin + api + service-provider + task + mq` 的模块化结构
-- 以 Nacos 作为唯一运行时配置中心
-- 以 Dubbo 作为内部服务调用协议
-- 以 MySQL 持久化业务主数据，以 Redis 承担会话、缓存与风控计数
+- 面向企业采购交易与履约协同，而不是普通零售商城
+- 聚焦订单履约主链，逐步扩展至售后、结算、采购和分析能力
+- 同时提供采购客户 App 端与后台管理端能力
+- 以 Nacos 作为统一配置中心，以 Dubbo 作为内部服务调用协议
+- 以 MySQL 持久化主数据，以 Redis 承担缓存、会话、锁与幂等控制
 
-## 核心能力
+## 一期目标
 
-- 后台端与 App 端用户彻底分离
-- 后台用户使用 `sys_user`
-- App 用户使用 `app_user`
-- App 端登录支持验签、盐值哈希、失败次数锁定、IP 封禁
-- 后台端与 App 端统一使用 JWT 双 Token 模式
-- 统一网关鉴权与路由转发
-- 角色、菜单、权限、操作日志基础骨架
-- 共享配置与模块配置拆分到 Nacos Data ID
+一期目标是交付一个最小但完整的 B2B 履约闭环，让系统能够真实完成一笔采购订单的全链路流转。
+
+一期重点包括：
+
+- 客户管理
+- 商品与 SKU 管理
+- 基础价格策略
+- 客户下单
+- 订单审核
+- 库存锁定
+- 基础分仓
+- 出库发货
+- 确认收货
+- 订单搜索与轨迹
+- 审计日志
+- 超时取消与自动确认收货任务
+
+## 核心业务主链
+
+```text
+客户下单
+  -> 订单审核
+  -> 锁库存
+  -> 分仓分配
+  -> 出库发货
+  -> 确认收货
+  -> 对账结算
+  -> 售后处理
+  -> 采购补货
+```
+
+当前代码与文档建设优先覆盖前半段，也就是订单、库存、仓库履约这条主线。
+
+## 业务角色
+
+- `采购客户`：浏览商品、提交订单、查单、确认收货
+- `销售 / 运营`：审核订单、改价、维护客户和价格策略
+- `仓库人员`：出库、发货、录入物流单号
+- `财务人员`：后续承接对账、回款、发票等能力
+- `采购专员`：后续承接采购申请、到货、补货等能力
+- `平台管理员`：维护主数据、权限、配置和审计
 
 ## 技术栈
 
@@ -34,6 +69,7 @@ SupplyChain 是一个基于 `JDK 21 + Spring Boot 3 + Spring Cloud Alibaba + Dub
 - `MySQL 8`
 - `RabbitMQ`
 - `Nacos`
+- `Elasticsearch`
 
 ## 工程结构
 
@@ -60,16 +96,25 @@ SupplyChain
 各模块职责：
 
 - `supplychain-common`：公共领域对象、MyBatis 支撑、安全与 Web 基础能力
-- `supplychain-service-api`：Dubbo 接口、DTO、视图对象
-- `supplychain-service-provider`：核心业务实现，按功能域拆包
+- `supplychain-service-api`：Dubbo 接口、DTO、命令对象、视图对象
+- `supplychain-service-provider`：订单、库存、履约、鉴权、审计等核心业务实现
 - `supplychain-admin`：后台管理端 HTTP 应用
-- `supplychain-api`：App 端 HTTP 应用
-- `supplychain-gateway`：网关、鉴权、统一入口
-- `supplychain-task`：定时任务
-- `supplychain-mq`：消息队列消费者与扩展能力
+- `supplychain-api`：采购客户 App / 客户端 HTTP 应用
+- `supplychain-gateway`：统一入口、鉴权、路由、链路透传
+- `supplychain-task`：超时取消、自动确认收货等定时任务
+- `supplychain-mq`：订单事件、通知事件、索引同步等异步能力承载模块
 - `nacos`：发布到 Nacos 的配置源文件
-- `docs`：项目文档
+- `docs`：项目设计、开发、部署文档
 - `sql`：数据库初始化脚本
+
+## 当前开发阶段
+
+当前项目处于“业务骨架已迁移、一期方案开始细化”的阶段：
+
+- 已完成项目命名与工程结构迁移
+- 已建立后台端、App 端、网关、Dubbo、Nacos、Redis、MySQL 基础骨架
+- 已沉淀 B2B 供应链订单履约平台总体设计方案
+- 正在补齐一期开发草案、数据模型、状态机和履约细节设计
 
 ## 当前包结构约定
 
@@ -183,21 +228,42 @@ cp deploy/env/prod.env.example deploy/env/prod.env
 
 ## 重要设计约束
 
+- 所有新增能力优先围绕订单履约主链推进，不做无主线扩展
 - 后台用户与 App 用户必须使用不同表，不允许复用
-- App 登录必须保留验签、盐值哈希与 Redis 风控链路
+- App 登录链路继续保留验签、盐值哈希与 Redis 风控能力
+- 订单、库存、履约、售后、结算状态分开建模，避免语义混杂
+- 关键动作必须保留审计轨迹，包括审核、改价、锁库、出库、发货、确认收货
 - 所有新增实体、DTO、接口模型需要补中文注释
 - 日志、异常、提示信息优先使用中文
 - 所有文本文件统一使用 `UTF-8`，且不得带 `BOM`
 
 ## 文档索引
 
+- 设计文档：[B2B 供应链订单履约平台设计方案](./docs/design/B2B供应链订单履约平台设计方案.md)
+- 一期开发草案：[一期开发草案](./docs/design/一期开发草案.md)
+- 一期数据模型草案：[一期数据模型草案](./docs/design/一期数据模型草案.md)
+- 一期建表 SQL 草案：[一期建表 SQL 草案](./docs/design/一期建表SQL草案.md)
+- 一期后台菜单结构草案：[一期后台菜单结构草案](./docs/design/一期后台菜单结构草案.md)
+- 一期项目结构层级草案：[一期项目结构层级草案](./docs/design/一期项目结构层级草案.md)
+- 订单状态机说明：[订单状态机说明](./docs/design/订单状态机说明.md)
+- 库存与分仓设计说明：[库存与分仓设计说明](./docs/design/库存与分仓设计说明.md)
+- 出库发货设计说明：[出库发货设计说明](./docs/design/出库发货设计说明.md)
 - App 登录与风控说明：[app-auth.md](docs/app端登录验签.md)
 - 本地运行说明：[local-run.md](docs/本地运行说明.md)
 - WSL / 远程部署说明：[deploy-guide.md](docs/部署说明.md)
 - 开发文档：[development-guide.md](docs/开发文档.md)
 - 开发规范：[development-standards.md](docs/开发规范.md)
+- 工程基线说明：[engineering-baseline.md](docs/工程基线说明.md)
 - Nacos 配置说明：[README.md](./nacos/README.md)
-- 设计文档：[B2B 供应链订单履约平台设计方案](./docs/design/B2B供应链订单履约平台设计方案.md)
+
+## 后续路线
+
+- 继续细化一期数据模型
+- 细化库存与分仓规则
+- 补充库存与分仓设计说明
+- 补充出库发货设计说明
+- 继续沉淀接口与建表草案
+- 逐步把一期业务骨架落到代码与 SQL
 
 ## 当前已知运行约束
 

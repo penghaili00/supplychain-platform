@@ -17,12 +17,12 @@
     <packaging>pom</packaging>
     <name>SupplyChain</name>
     <description>SupplyChain microservice scaffold</description>
-    <url>https://github.com/your-org/supplychain-platform</url>
+    <url>https://github.com/penghaili00/supplychain-platform</url>
 
     <scm>
-        <connection>scm:git:git@github.com:your-org/supplychain-platform.git</connection>
-        <developerConnection>scm:git:git@github.com:your-org/supplychain-platform.git</developerConnection>
-        <url>https://github.com/your-org/supplychain-platform</url>
+        <connection>scm:git:git@github.com:penghaili00/supplychain-platform.git</connection>
+        <developerConnection>scm:git:git@github.com:penghaili00/supplychain-platform.git</developerConnection>
+        <url>https://github.com/penghaili00/supplychain-platform</url>
         <tag>HEAD</tag>
     </scm>
 

@@ -37,6 +37,12 @@ public class AppUser extends BaseEntity {
     private String displayName;
 
     /**
+     * 客户ID
+     */
+    @TableField("customer_id")
+    private Long customerId;
+
+    /**
      * 状态，1 启用，0 禁用
      */
     private Integer status;

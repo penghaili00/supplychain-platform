@@ -1,4 +1,4 @@
-package com.supplychain.service.api.dto;
+package com.supplychain.service.api.admin.user.view;
 
 import com.supplychain.common.core.enums.UserType;
 import lombok.AllArgsConstructor;

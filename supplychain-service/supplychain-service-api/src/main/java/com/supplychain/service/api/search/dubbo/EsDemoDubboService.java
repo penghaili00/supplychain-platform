@@ -1,7 +1,7 @@
-package com.supplychain.service.api.dubbo;
+package com.supplychain.service.api.search.dubbo;
 
-import com.supplychain.service.api.dto.EsClusterInfoView;
-import com.supplychain.service.api.dto.EsProductDocumentView;
+import com.supplychain.service.api.search.view.EsClusterInfoView;
+import com.supplychain.service.api.search.view.EsProductDocumentView;
 
 import java.util.List;
 

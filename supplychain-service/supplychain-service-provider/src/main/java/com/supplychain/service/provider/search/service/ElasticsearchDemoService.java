@@ -2,8 +2,8 @@ package com.supplychain.service.provider.search.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.supplychain.common.core.exception.BizException;
-import com.supplychain.service.api.dto.EsClusterInfoView;
-import com.supplychain.service.api.dto.EsProductDocumentView;
+import com.supplychain.service.api.search.view.EsClusterInfoView;
+import com.supplychain.service.api.search.view.EsProductDocumentView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;

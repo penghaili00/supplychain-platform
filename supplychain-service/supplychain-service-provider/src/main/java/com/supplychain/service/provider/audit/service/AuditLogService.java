@@ -1,6 +1,6 @@
 package com.supplychain.service.provider.audit.service;
 
-import com.supplychain.service.api.dto.AuditLogCommand;
+import com.supplychain.service.api.audit.command.AuditLogCommand;
 import com.supplychain.service.provider.audit.entity.SysOperationLog;
 import com.supplychain.service.provider.audit.mapper.SysOperationLogMapper;
 import lombok.RequiredArgsConstructor;

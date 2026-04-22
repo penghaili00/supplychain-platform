@@ -1,9 +1,9 @@
 package com.supplychain.service.provider.admin.user.dubbo;
 
 import com.supplychain.common.core.domain.SessionUser;
-import com.supplychain.service.api.dubbo.AdminUserDubboService;
-import com.supplychain.service.api.dto.AdminUserQuery;
-import com.supplychain.service.api.dto.AdminUserView;
+import com.supplychain.service.api.admin.user.dubbo.AdminUserDubboService;
+import com.supplychain.service.api.admin.user.query.AdminUserQuery;
+import com.supplychain.service.api.admin.user.view.AdminUserView;
 import com.supplychain.service.provider.admin.user.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;

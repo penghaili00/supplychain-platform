@@ -1,4 +1,4 @@
-package com.supplychain.service.api.dto;
+package com.supplychain.service.api.app.user.command;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

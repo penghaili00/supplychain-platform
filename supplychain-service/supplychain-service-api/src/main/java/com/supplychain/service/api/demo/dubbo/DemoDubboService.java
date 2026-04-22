@@ -1,4 +1,4 @@
-package com.supplychain.service.api.dubbo;
+package com.supplychain.service.api.demo.dubbo;
 
 public interface DemoDubboService {
 

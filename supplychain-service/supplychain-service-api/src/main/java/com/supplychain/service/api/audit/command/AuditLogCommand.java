@@ -1,4 +1,4 @@
-package com.supplychain.service.api.dto;
+package com.supplychain.service.api.audit.command;
 
 import com.supplychain.common.core.enums.OperationType;
 import lombok.AllArgsConstructor;

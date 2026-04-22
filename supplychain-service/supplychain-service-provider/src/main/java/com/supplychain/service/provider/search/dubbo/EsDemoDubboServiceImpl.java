@@ -1,8 +1,8 @@
 package com.supplychain.service.provider.search.dubbo;
 
-import com.supplychain.service.api.dubbo.EsDemoDubboService;
-import com.supplychain.service.api.dto.EsClusterInfoView;
-import com.supplychain.service.api.dto.EsProductDocumentView;
+import com.supplychain.service.api.search.dubbo.EsDemoDubboService;
+import com.supplychain.service.api.search.view.EsClusterInfoView;
+import com.supplychain.service.api.search.view.EsProductDocumentView;
 import com.supplychain.service.provider.search.service.ElasticsearchDemoService;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;

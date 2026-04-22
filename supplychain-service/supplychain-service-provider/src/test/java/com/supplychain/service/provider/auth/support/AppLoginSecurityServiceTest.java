@@ -1,7 +1,7 @@
 package com.supplychain.service.provider.auth.support;
 
 import com.supplychain.common.core.exception.UnauthorizedException;
-import com.supplychain.service.api.dto.AppLoginCommand;
+import com.supplychain.service.api.app.user.command.AppLoginCommand;
 import com.supplychain.service.provider.auth.config.AppAuthSecurityProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

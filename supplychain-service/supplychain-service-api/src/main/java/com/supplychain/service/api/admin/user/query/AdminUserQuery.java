@@ -1,4 +1,4 @@
-package com.supplychain.service.api.dto;
+package com.supplychain.service.api.admin.user.query;
 
 import lombok.Data;
 

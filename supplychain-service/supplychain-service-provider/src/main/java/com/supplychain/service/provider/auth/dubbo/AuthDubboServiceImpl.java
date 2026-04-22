@@ -1,12 +1,12 @@
 package com.supplychain.service.provider.auth.dubbo;
 
 import com.supplychain.common.core.enums.UserType;
-import com.supplychain.service.api.dubbo.AuthDubboService;
-import com.supplychain.service.api.dto.AdminLoginCommand;
-import com.supplychain.service.api.dto.AppLoginCommand;
-import com.supplychain.service.api.dto.RefreshTokenCommand;
-import com.supplychain.service.api.dto.TokenView;
-import com.supplychain.service.api.dto.UserProfileView;
+import com.supplychain.service.api.auth.dubbo.AuthDubboService;
+import com.supplychain.service.api.admin.user.command.AdminLoginCommand;
+import com.supplychain.service.api.app.user.command.AppLoginCommand;
+import com.supplychain.service.api.auth.command.RefreshTokenCommand;
+import com.supplychain.service.api.auth.view.TokenView;
+import com.supplychain.service.api.app.user.view.UserProfileView;
 import com.supplychain.service.provider.auth.service.AdminAuthService;
 import com.supplychain.service.provider.auth.service.AppAuthService;
 import com.supplychain.service.provider.auth.service.AuthTokenService;

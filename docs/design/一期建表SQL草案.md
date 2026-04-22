@@ -1,174 +1,75 @@
--- Compatibility bootstrap script.
--- Flyway migrations V1__init_schema.sql and V2__phase_one_b2b_schema.sql are the authoritative schema source.
-CREATE DATABASE IF NOT EXISTS `supplychain` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE `supplychain`;
+# B2B 供应链订单履约平台一期建表 SQL 草案
 
-DROP TABLE IF EXISTS `sc_shipment_order`;
-DROP TABLE IF EXISTS `sc_outbound_item`;
-DROP TABLE IF EXISTS `sc_outbound_order`;
-DROP TABLE IF EXISTS `sc_order_operation_log`;
-DROP TABLE IF EXISTS `sc_order_item`;
-DROP TABLE IF EXISTS `sc_order_main`;
-DROP TABLE IF EXISTS `sc_inventory_log`;
-DROP TABLE IF EXISTS `sc_inventory_lock`;
-DROP TABLE IF EXISTS `sc_inventory`;
-DROP TABLE IF EXISTS `sc_warehouse`;
-DROP TABLE IF EXISTS `sc_price_policy`;
-DROP TABLE IF EXISTS `sc_product_sku`;
-DROP TABLE IF EXISTS `sc_product_spu`;
-DROP TABLE IF EXISTS `sc_product_category`;
-DROP TABLE IF EXISTS `sc_customer_address`;
-DROP TABLE IF EXISTS `sc_customer_contact`;
-DROP TABLE IF EXISTS `sc_customer`;
-DROP TABLE IF EXISTS `sys_role_menu`;
-DROP TABLE IF EXISTS `app_user_role`;
-DROP TABLE IF EXISTS `sys_user_role`;
-DROP TABLE IF EXISTS `sys_operation_log`;
-DROP TABLE IF EXISTS `sys_menu`;
-DROP TABLE IF EXISTS `sys_role`;
-DROP TABLE IF EXISTS `app_user`;
-DROP TABLE IF EXISTS `sys_user`;
+## 1. 文档目标
 
-CREATE TABLE `sys_user` (
-  `id` bigint NOT NULL,
-  `username` varchar(64) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `display_name` varchar(100) NOT NULL,
-  `dept_id` bigint DEFAULT NULL,
-  `dept_ancestors` varchar(255) DEFAULT NULL,
-  `status` tinyint NOT NULL DEFAULT 1,
-  `created_by` varchar(64) DEFAULT NULL,
-  `created_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_by` varchar(64) DEFAULT NULL,
-  `updated_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted` tinyint NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_sys_user_username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+本文档用于沉淀一期业务主链的建表草案，作为后续 Flyway 迁移脚本和实体设计的直接参考。
 
-CREATE TABLE `app_user` (
-  `id` bigint NOT NULL,
-  `username` varchar(64) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `password_salt` varchar(255) NOT NULL,
-  `display_name` varchar(100) NOT NULL,
-  `customer_id` bigint DEFAULT NULL,
-  `status` tinyint NOT NULL DEFAULT 1,
-  `created_by` varchar(64) DEFAULT NULL,
-  `created_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_by` varchar(64) DEFAULT NULL,
-  `updated_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted` tinyint NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_app_user_username` (`username`),
-  KEY `idx_app_user_customer_id` (`customer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+本文档关注两件事：
 
-CREATE TABLE `sys_role` (
-  `id` bigint NOT NULL,
-  `role_key` varchar(64) NOT NULL,
-  `role_name` varchar(100) NOT NULL,
-  `data_scope` varchar(32) NOT NULL DEFAULT 'SELF',
-  `status` tinyint NOT NULL DEFAULT 1,
-  `created_by` varchar(64) DEFAULT NULL,
-  `created_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_by` varchar(64) DEFAULT NULL,
-  `updated_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted` tinyint NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_sys_role_role_key` (`role_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+- 给出一期核心业务表的 SQL 建表草案
+- 确保表和字段都带中文说明，便于后续维护和协作
 
-CREATE TABLE `sys_menu` (
-  `id` bigint NOT NULL,
-  `menu_name` varchar(100) NOT NULL,
-  `permission_code` varchar(100) DEFAULT NULL,
-  `status` tinyint NOT NULL DEFAULT 1,
-  `created_by` varchar(64) DEFAULT NULL,
-  `created_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_by` varchar(64) DEFAULT NULL,
-  `updated_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted` tinyint NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+当前内容为一期草案，不要求一次性覆盖所有后续能力，但要能支撑：
 
-CREATE TABLE `sys_user_role` (
-  `id` bigint NOT NULL,
-  `user_id` bigint NOT NULL,
-  `role_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_sys_user_role_user_id` (`user_id`),
-  KEY `idx_sys_user_role_role_id` (`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+- 客户主数据
+- 商品与价格
+- 仓库与库存
+- 订单与轨迹
+- 出库与发货
 
-CREATE TABLE `app_user_role` (
-  `id` bigint NOT NULL,
-  `user_id` bigint NOT NULL,
-  `role_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_app_user_role_user_id` (`user_id`),
-  KEY `idx_app_user_role_role_id` (`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+同时，一期采用 `app_user.customer_id` 直接关联客户主体，不单独新增账号关系表。
 
-CREATE TABLE `sys_role_menu` (
-  `id` bigint NOT NULL,
-  `role_id` bigint NOT NULL,
-  `menu_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_sys_role_menu_role_id` (`role_id`),
-  KEY `idx_sys_role_menu_menu_id` (`menu_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+## 2. 使用说明
 
-CREATE TABLE `sys_operation_log` (
-  `id` bigint NOT NULL,
-  `operator_id` bigint DEFAULT NULL,
-  `operator_name` varchar(100) DEFAULT NULL,
-  `title` varchar(100) NOT NULL,
-  `business_type` varchar(32) DEFAULT NULL,
-  `method` varchar(255) DEFAULT NULL,
-  `request_uri` varchar(255) DEFAULT NULL,
-  `request_method` varchar(20) DEFAULT NULL,
-  `ip` varchar(64) DEFAULT NULL,
-  `request_param` longtext,
-  `response_data` longtext,
-  `success` tinyint NOT NULL DEFAULT 1,
-  `message` varchar(500) DEFAULT NULL,
-  `operate_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  `created_by` varchar(64) DEFAULT NULL,
-  `created_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_by` varchar(64) DEFAULT NULL,
-  `updated_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted` tinyint NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+- 当前 SQL 面向 `MySQL 8`
+- 统一使用 `utf8mb4`
+- 统一采用逻辑删除字段 `deleted`
+- 统一保留 `created_by / created_time / updated_by / updated_time`
+- 金额字段统一使用 `decimal(18,2)`
+- 数量字段统一使用 `decimal(18,4)`
+- 状态字段一期先使用 `varchar`，后续如需优化可再切枚举编码
 
-INSERT INTO `sys_user` (`id`, `username`, `password`, `display_name`, `dept_id`, `dept_ancestors`, `status`, `created_by`, `updated_by`, `deleted`) VALUES
-(1001, 'admin', '{noop}Admin@123', 'SupplyChain管理员', 100, ',100,', 1, 'system', 'system', 0);
+## 3. 命名约定
 
-INSERT INTO `app_user` (`id`, `username`, `password_hash`, `password_salt`, `display_name`, `customer_id`, `status`, `created_by`, `updated_by`, `deleted`) VALUES
-(2001, 'demo', '/Aau8JFf63ZAAyaS7oaqEuP5IN/GbnCy48oC76mKNlY=', 'bXBIFnmlxK3G5KJMYFYmeA==', 'SupplyChain演示用户', 8001, 1, 'system', 'system', 0);
+- 业务表统一使用 `sc_` 前缀
+- 主键统一使用 `id`
+- 编号类字段统一使用 `*_code` 或 `*_no`
+- 状态类字段统一使用 `*_status` 或 `status`
+- 备注统一使用 `remark`
 
-INSERT INTO `sys_role` (`id`, `role_key`, `role_name`, `data_scope`, `status`, `created_by`, `updated_by`, `deleted`) VALUES
-(3001, 'super_admin', '超级管理员', 'ALL', 1, 'system', 'system', 0),
-(3002, 'app_user', '用户端角色', 'SELF', 1, 'system', 'system', 0);
+## 4. 建表顺序建议
 
-INSERT INTO `sys_menu` (`id`, `menu_name`, `permission_code`, `status`, `created_by`, `updated_by`, `deleted`) VALUES
-(4001, '后台用户查询', 'sys:user:list', 1, 'system', 'system', 0),
-(4002, '操作日志查询', 'sys:log:list', 1, 'system', 'system', 0),
-(4003, '用户资料查看', 'app:profile:view', 1, 'system', 'system', 0);
+建议按以下顺序落地：
 
-INSERT INTO `sys_user_role` (`id`, `user_id`, `role_id`) VALUES
-(5001, 1001, 3001);
+1. 客户域
+2. 商品域
+3. 仓库库存域
+4. 订单履约域
 
-INSERT INTO `app_user_role` (`id`, `user_id`, `role_id`) VALUES
-(5002, 2001, 3002);
+这样更符合实际开发顺序，也更容易分批验证。
 
-INSERT INTO `sys_role_menu` (`id`, `role_id`, `menu_id`) VALUES
-(6001, 3001, 4001),
-(6002, 3001, 4002),
-(6003, 3002, 4003);
+## 5. 客户域
 
-CREATE TABLE `sc_customer` (
+### 5.0 `app_user` 增量字段调整
+
+一期建议在现有 `app_user` 基础上直接增加客户归属字段：
+
+```sql
+ALTER TABLE `app_user`
+  ADD COLUMN `customer_id` bigint DEFAULT NULL COMMENT '客户ID' AFTER `display_name`,
+  ADD KEY `idx_app_user_customer_id` (`customer_id`);
+```
+
+说明：
+
+- `app_user` 负责登录身份
+- `sc_customer` 负责客户主体
+- 一期采用 `app_user.customer_id` 直接绑定客户主体，简化模型和查询路径
+
+### 5.1 `sc_customer`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_customer` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `customer_code` varchar(64) NOT NULL COMMENT '客户编码',
   `customer_name` varchar(128) NOT NULL COMMENT '客户名称',
@@ -190,8 +91,12 @@ CREATE TABLE `sc_customer` (
   KEY `idx_sc_customer_name` (`customer_name`),
   KEY `idx_sc_customer_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='客户主表';
+```
 
-CREATE TABLE `sc_customer_contact` (
+### 5.2 `sc_customer_contact`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_customer_contact` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `customer_id` bigint NOT NULL COMMENT '客户ID',
   `contact_name` varchar(64) NOT NULL COMMENT '联系人姓名',
@@ -210,8 +115,12 @@ CREATE TABLE `sc_customer_contact` (
   KEY `idx_sc_customer_contact_customer_id` (`customer_id`),
   KEY `idx_sc_customer_contact_mobile` (`mobile`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='客户联系人表';
+```
 
-CREATE TABLE `sc_customer_address` (
+### 5.3 `sc_customer_address`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_customer_address` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `customer_id` bigint NOT NULL COMMENT '客户ID',
   `receiver_name` varchar(64) NOT NULL COMMENT '收货人姓名',
@@ -231,8 +140,14 @@ CREATE TABLE `sc_customer_address` (
   PRIMARY KEY (`id`),
   KEY `idx_sc_customer_address_customer_id` (`customer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='客户收货地址表';
+```
 
-CREATE TABLE `sc_product_category` (
+## 6. 商品域
+
+### 6.1 `sc_product_category`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_product_category` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `parent_id` bigint NOT NULL DEFAULT 0 COMMENT '父分类ID',
   `category_name` varchar(128) NOT NULL COMMENT '分类名称',
@@ -250,8 +165,12 @@ CREATE TABLE `sc_product_category` (
   UNIQUE KEY `uk_sc_product_category_code` (`category_code`),
   KEY `idx_sc_product_category_parent_id` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品分类表';
+```
 
-CREATE TABLE `sc_product_spu` (
+### 6.2 `sc_product_spu`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_product_spu` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `spu_code` varchar(64) NOT NULL COMMENT 'SPU编码',
   `spu_name` varchar(128) NOT NULL COMMENT 'SPU名称',
@@ -271,8 +190,12 @@ CREATE TABLE `sc_product_spu` (
   KEY `idx_sc_product_spu_category_id` (`category_id`),
   KEY `idx_sc_product_spu_sale_status` (`sale_status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品SPU表';
+```
 
-CREATE TABLE `sc_product_sku` (
+### 6.3 `sc_product_sku`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_product_sku` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `sku_code` varchar(64) NOT NULL COMMENT 'SKU编码',
   `spu_id` bigint NOT NULL COMMENT 'SPU ID',
@@ -294,8 +217,12 @@ CREATE TABLE `sc_product_sku` (
   KEY `idx_sc_product_sku_spu_id` (`spu_id`),
   KEY `idx_sc_product_sku_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品SKU表';
+```
 
-CREATE TABLE `sc_price_policy` (
+### 6.4 `sc_price_policy`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_price_policy` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `customer_id` bigint DEFAULT NULL COMMENT '客户ID，为空表示基础价',
   `sku_id` bigint NOT NULL COMMENT 'SKU ID',
@@ -315,8 +242,14 @@ CREATE TABLE `sc_price_policy` (
   KEY `idx_sc_price_policy_customer_sku` (`customer_id`, `sku_id`),
   KEY `idx_sc_price_policy_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='价格策略表';
+```
 
-CREATE TABLE `sc_warehouse` (
+## 7. 仓库库存域
+
+### 7.1 `sc_warehouse`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_warehouse` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `warehouse_code` varchar(64) NOT NULL COMMENT '仓库编码',
   `warehouse_name` varchar(128) NOT NULL COMMENT '仓库名称',
@@ -335,8 +268,12 @@ CREATE TABLE `sc_warehouse` (
   KEY `idx_sc_warehouse_region_code` (`region_code`),
   KEY `idx_sc_warehouse_status_priority` (`status`, `priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='仓库主表';
+```
 
-CREATE TABLE `sc_inventory` (
+### 7.2 `sc_inventory`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_inventory` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `warehouse_id` bigint NOT NULL COMMENT '仓库ID',
   `sku_id` bigint NOT NULL COMMENT 'SKU ID',
@@ -356,8 +293,12 @@ CREATE TABLE `sc_inventory` (
   UNIQUE KEY `uk_sc_inventory_warehouse_sku` (`warehouse_id`, `sku_id`),
   KEY `idx_sc_inventory_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='仓库库存表';
+```
 
-CREATE TABLE `sc_inventory_lock` (
+### 7.3 `sc_inventory_lock`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_inventory_lock` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `order_id` bigint NOT NULL COMMENT '订单ID',
   `order_item_id` bigint NOT NULL COMMENT '订单明细ID',
@@ -379,8 +320,12 @@ CREATE TABLE `sc_inventory_lock` (
   KEY `idx_sc_inventory_lock_order_item_id` (`order_item_id`),
   KEY `idx_sc_inventory_lock_status` (`lock_status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='库存锁定记录表';
+```
 
-CREATE TABLE `sc_inventory_log` (
+### 7.4 `sc_inventory_log`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_inventory_log` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `warehouse_id` bigint NOT NULL COMMENT '仓库ID',
   `sku_id` bigint NOT NULL COMMENT 'SKU ID',
@@ -402,8 +347,14 @@ CREATE TABLE `sc_inventory_log` (
   KEY `idx_sc_inventory_log_warehouse_sku` (`warehouse_id`, `sku_id`),
   KEY `idx_sc_inventory_log_biz_no` (`biz_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='库存流水表';
+```
 
-CREATE TABLE `sc_order_main` (
+## 8. 订单履约域
+
+### 8.1 `sc_order_main`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_order_main` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `order_no` varchar(64) NOT NULL COMMENT '订单号',
   `parent_order_id` bigint DEFAULT NULL COMMENT '父订单ID',
@@ -435,8 +386,12 @@ CREATE TABLE `sc_order_main` (
   KEY `idx_sc_order_main_customer_status` (`customer_id`, `order_status`),
   KEY `idx_sc_order_main_submit_time` (`submit_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单主表';
+```
 
-CREATE TABLE `sc_order_item` (
+### 8.2 `sc_order_item`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_order_item` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `order_id` bigint NOT NULL COMMENT '订单ID',
   `sku_id` bigint NOT NULL COMMENT 'SKU ID',
@@ -461,8 +416,12 @@ CREATE TABLE `sc_order_item` (
   KEY `idx_sc_order_item_sku_id` (`sku_id`),
   KEY `idx_sc_order_item_warehouse_id` (`warehouse_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单明细表';
+```
 
-CREATE TABLE `sc_order_operation_log` (
+### 8.3 `sc_order_operation_log`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_order_operation_log` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `order_id` bigint NOT NULL COMMENT '订单ID',
   `order_no` varchar(64) NOT NULL COMMENT '订单号',
@@ -484,8 +443,12 @@ CREATE TABLE `sc_order_operation_log` (
   KEY `idx_sc_order_operation_log_order_id` (`order_id`),
   KEY `idx_sc_order_operation_log_operate_time` (`operate_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单业务轨迹表';
+```
 
-CREATE TABLE `sc_outbound_order` (
+### 8.4 `sc_outbound_order`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_outbound_order` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `outbound_no` varchar(64) NOT NULL COMMENT '出库单号',
   `order_id` bigint NOT NULL COMMENT '订单ID',
@@ -505,8 +468,12 @@ CREATE TABLE `sc_outbound_order` (
   KEY `idx_sc_outbound_order_order_id` (`order_id`),
   KEY `idx_sc_outbound_order_status` (`outbound_status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='出库单表';
+```
 
-CREATE TABLE `sc_outbound_item` (
+### 8.5 `sc_outbound_item`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_outbound_item` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `outbound_id` bigint NOT NULL COMMENT '出库单ID',
   `order_item_id` bigint NOT NULL COMMENT '订单明细ID',
@@ -523,8 +490,12 @@ CREATE TABLE `sc_outbound_item` (
   KEY `idx_sc_outbound_item_outbound_id` (`outbound_id`),
   KEY `idx_sc_outbound_item_order_item_id` (`order_item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='出库单明细表';
+```
 
-CREATE TABLE `sc_shipment_order` (
+### 8.6 `sc_shipment_order`
+
+```sql
+CREATE TABLE IF NOT EXISTS `sc_shipment_order` (
   `id` bigint NOT NULL COMMENT '主键ID',
   `shipment_no` varchar(64) NOT NULL COMMENT '发货单号',
   `order_id` bigint NOT NULL COMMENT '订单ID',
@@ -546,6 +517,49 @@ CREATE TABLE `sc_shipment_order` (
   KEY `idx_sc_shipment_order_order_id` (`order_id`),
   KEY `idx_sc_shipment_order_logistics_no` (`logistics_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='发货单表';
+```
 
-INSERT INTO `sc_customer` (`id`, `customer_code`, `customer_name`, `customer_type`, `customer_level`, `sales_owner_id`, `status`, `credit_enabled`, `credit_limit`, `settlement_type`, `remark`, `created_by`, `updated_by`, `deleted`) VALUES
-(8001, 'CUST_DEMO_001', 'SupplyChain演示采购客户', 'ENTERPRISE', 'NORMAL', 1001, 'ENABLED', 0, 0.00, 'CASH', '初始化演示客户', 'system', 'system', 0);
+## 9. 外键策略建议
+
+一期建议先以 `索引 + 应用层约束` 为主，不强制使用数据库外键。
+
+原因：
+
+- 微服务场景下更方便演进
+- 迁移和初始化更灵活
+- 避免影响批量导入和后续表结构调整
+
+但在服务层必须保证以下关系正确：
+
+- 客户、地址、联系人归属关系正确
+- SPU、SKU、价格策略关系正确
+- 仓库、库存、锁库关系正确
+- 订单、明细、轨迹、出库、发货关系正确
+
+## 10. 状态值建议
+
+本文档中的状态字段建议先与设计文档保持一致：
+
+- `order_status`
+- `audit_status`
+- `fulfillment_status`
+- `outbound_status`
+- `shipment_status`
+- `lock_status`
+- `status`
+
+具体枚举值以以下文档为准：
+
+- [订单状态机说明](./订单状态机说明.md)
+- [库存与分仓设计说明](./库存与分仓设计说明.md)
+- [出库发货设计说明](./出库发货设计说明.md)
+
+## 11. 后续落地建议
+
+本文档确认后，建议按以下顺序继续推进：
+
+1. 基于本文档补正式 Flyway 脚本
+2. 建实体、Mapper、枚举和领域服务接口
+3. 先落客户、商品、仓库、库存基础表
+4. 再落订单、出库、发货表
+5. 最后补初始化演示数据

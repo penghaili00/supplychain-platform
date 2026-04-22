@@ -1,4 +1,4 @@
-package com.supplychain.service.api.dto;
+package com.supplychain.service.api.auth.command;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

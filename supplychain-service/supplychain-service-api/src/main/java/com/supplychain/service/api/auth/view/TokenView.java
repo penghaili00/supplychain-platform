@@ -1,4 +1,4 @@
-package com.supplychain.service.api.dto;
+package com.supplychain.service.api.auth.view;
 
 import com.supplychain.common.core.domain.SessionUser;
 import lombok.AllArgsConstructor;

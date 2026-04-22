@@ -1,4 +1,4 @@
-package com.supplychain.service.api.dto;
+package com.supplychain.service.api.search.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,15 +11,15 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EsProductDocumentView implements Serializable {
-
-    private Integer id;
+public class EsClusterInfoView implements Serializable {
 
     private String name;
 
-    private String brand;
+    private String clusterName;
 
-    private Double price;
+    private String clusterUuid;
 
-    private String createdAt;
+    private String version;
+
+    private String status;
 }

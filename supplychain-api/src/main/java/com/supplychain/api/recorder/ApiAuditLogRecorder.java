@@ -2,8 +2,8 @@ package com.supplychain.api.recorder;
 
 import com.supplychain.common.core.domain.AuditLogRecord;
 import com.supplychain.common.core.spi.AuditLogRecorder;
-import com.supplychain.service.api.dubbo.AuditLogDubboService;
-import com.supplychain.service.api.dto.AuditLogCommand;
+import com.supplychain.service.api.audit.dubbo.AuditLogDubboService;
+import com.supplychain.service.api.audit.command.AuditLogCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Component;

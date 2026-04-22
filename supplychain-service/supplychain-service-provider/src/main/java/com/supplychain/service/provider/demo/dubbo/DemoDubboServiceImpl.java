@@ -1,6 +1,6 @@
 package com.supplychain.service.provider.demo.dubbo;
 
-import com.supplychain.service.api.dubbo.DemoDubboService;
+import com.supplychain.service.api.demo.dubbo.DemoDubboService;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import java.time.LocalDateTime;

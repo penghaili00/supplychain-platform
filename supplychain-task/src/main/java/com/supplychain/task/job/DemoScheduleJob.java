@@ -1,6 +1,6 @@
 package com.supplychain.task.job;
 
-import com.supplychain.service.api.dubbo.DemoDubboService;
+import com.supplychain.service.api.demo.dubbo.DemoDubboService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.scheduling.annotation.Scheduled;

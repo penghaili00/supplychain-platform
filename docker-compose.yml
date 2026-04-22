@@ -73,7 +73,7 @@ services:
       NACOS_AUTH_ENABLE: "true"
       NACOS_AUTH_IDENTITY_KEY: serverIdentity
       NACOS_AUTH_IDENTITY_VALUE: security
-      NACOS_AUTH_TOKEN: ${SUPPLYCHAIN_NACOS_AUTH_TOKEN:-SupplyChainNacosServerIdentityToken2026}
+      NACOS_AUTH_TOKEN: ${SUPPLYCHAIN_NACOS_AUTH_TOKEN:-UbDoEOaouFpEl4YSxzCvLW/y61x8dp79JbdEK3KA93Y=}
       JVM_XMS: 512m
       JVM_XMX: 512m
       JVM_XMN: 256m

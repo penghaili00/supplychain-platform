@@ -246,7 +246,10 @@ INSERT INTO `sys_menu` (`id`, `menu_name`, `permission_code`, `status`, `created
 (4254, '发货单发货', 'shipment:shipment:deliver', 1, 'system', 'system', 0),
 (4255, '订单轨迹查询', 'order:trace:list', 1, 'system', 'system', 0),
 (4256, '订单轨迹详情', 'order:trace:view', 1, 'system', 'system', 0),
-(4257, '操作日志详情', 'sys:log:view', 1, 'system', 'system', 0);
+(4257, '操作日志详情', 'sys:log:view', 1, 'system', 'system', 0),
+(4258, '客户 App 账号开通', 'customer:app-account:create', 1, 'system', 'system', 0),
+(4259, '客户 App 账号更新', 'customer:app-account:update', 1, 'system', 'system', 0),
+(4260, '客户 App 账号重置密码', 'customer:app-account:reset-password', 1, 'system', 'system', 0);
 
 INSERT INTO `sys_user_role` (`id`, `user_id`, `role_id`) VALUES
 (5001, 1001, 3001);
@@ -348,7 +351,10 @@ INSERT INTO `sys_role_menu` (`id`, `role_id`, `menu_id`) VALUES
 (6280, 3001, 4254),
 (6281, 3001, 4255),
 (6282, 3001, 4256),
-(6283, 3001, 4257);
+(6283, 3001, 4257),
+(6284, 3001, 4258),
+(6285, 3001, 4259),
+(6286, 3001, 4260);
 
 CREATE TABLE `sc_customer` (
   `id` bigint NOT NULL COMMENT '主键ID',

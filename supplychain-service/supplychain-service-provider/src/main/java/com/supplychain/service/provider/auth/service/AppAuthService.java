@@ -11,6 +11,8 @@ import com.supplychain.service.provider.app.user.mapper.AppUserMapper;
 import com.supplychain.service.provider.auth.support.AppLoginSecurityService;
 import com.supplychain.service.provider.auth.support.AppPasswordHasher;
 import com.supplychain.service.provider.auth.support.AuthSessionUserFactory;
+import com.supplychain.service.provider.customer.entity.Customer;
+import com.supplychain.service.provider.customer.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class AppAuthService {
     private final AppLoginSecurityService appLoginSecurityService;
     private final AuthSessionUserFactory authSessionUserFactory;
     private final AuthTokenService authTokenService;
+    private final CustomerService customerService;
 
     public TokenView login(AppLoginCommand command) {
         String clientIp = appLoginSecurityService.normalizeClientIp(command.getClientIp());
@@ -66,6 +69,7 @@ public class AppAuthService {
             appLoginSecurityService.ensureAccountAllowed(user.getUsername());
             throw new UnauthorizedException("用户名或密码错误");
         }
+        ensureCustomerEnabled(user);
         appLoginSecurityService.clearAccountFailures(user.getUsername());
         return authTokenService.issueToken(authSessionUserFactory.buildAppSessionUser(user));
     }
@@ -89,5 +93,20 @@ public class AppAuthService {
                 .roles(sessionUser.getRoles())
                 .permissions(sessionUser.getPermissions())
                 .build();
+    }
+
+    private void ensureCustomerEnabled(AppUser user) {
+        if (user.getCustomerId() == null) {
+            return;
+        }
+        Customer customer = customerService.getById(user.getCustomerId());
+        if (customer == null) {
+            log.warn("App 登录失败，客户主体不存在，username={}，customerId={}", user.getUsername(), user.getCustomerId());
+            throw new BizException(403, "客户主体不存在或已停用");
+        }
+        if (!"ENABLED".equalsIgnoreCase(customer.getStatus())) {
+            log.warn("App 登录失败，客户主体已停用，username={}，customerId={}", user.getUsername(), user.getCustomerId());
+            throw new BizException(403, "客户已停用");
+        }
     }
 }

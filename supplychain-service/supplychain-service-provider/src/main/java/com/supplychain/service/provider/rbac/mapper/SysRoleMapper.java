@@ -30,4 +30,13 @@ public interface SysRoleMapper extends BaseMapper<SysRole> {
               and r.status = 1
             """)
     List<SysRole> listByAppUserId(@Param("userId") Long userId);
+
+    @Select("""
+            select *
+            from sys_role
+            where role_key = #{roleKey}
+              and deleted = 0
+            limit 1
+            """)
+    SysRole selectByRoleKey(@Param("roleKey") String roleKey);
 }

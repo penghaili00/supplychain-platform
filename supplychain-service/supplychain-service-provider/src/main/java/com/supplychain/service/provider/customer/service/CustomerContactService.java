@@ -29,4 +29,14 @@ public class CustomerContactService extends BaseCrudService<CustomerContact> {
                 .last("limit 1");
         return selectOne(queryWrapper);
     }
+
+    public List<CustomerContact> listByCustomerIds(List<Long> customerIds) {
+        if (customerIds == null || customerIds.isEmpty()) {
+            return List.of();
+        }
+        QueryWrapper<CustomerContact> queryWrapper = activeQuery();
+        queryWrapper.in("customer_id", customerIds)
+                .orderByAsc("id");
+        return selectList(queryWrapper);
+    }
 }

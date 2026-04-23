@@ -241,6 +241,7 @@ cp deploy/env/prod.env.example deploy/env/prod.env
 
 - 设计文档：[B2B 供应链订单履约平台设计方案](./docs/design/B2B供应链订单履约平台设计方案.md)
 - 一期开发草案：[一期开发草案](./docs/design/一期开发草案.md)
+- 一期整体开发清单：[一期整体开发清单](./docs/design/一期整体开发清单.md)
 - 一期数据模型草案：[一期数据模型草案](./docs/design/一期数据模型草案.md)
 - 一期建表 SQL 草案：[一期建表 SQL 草案](./docs/design/一期建表SQL草案.md)
 - 一期后台菜单结构草案：[一期后台菜单结构草案](./docs/design/一期后台菜单结构草案.md)

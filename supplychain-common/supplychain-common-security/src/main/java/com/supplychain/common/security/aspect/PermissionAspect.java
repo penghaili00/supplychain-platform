@@ -15,13 +15,16 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class PermissionAspect {
 
+    private static final String SUPER_ADMIN_ROLE_KEY = "super_admin";
+
     @Before("@annotation(requirePermission)")
     public void checkPermission(JoinPoint joinPoint, RequirePermission requirePermission) {
         SessionUser sessionUser = UserContextHolder.getUser();
         if (sessionUser == null) {
             throw new UnauthorizedException("未登录或登录状态已失效");
         }
-        if (sessionUser.isAdmin()) {
+        if (!CollectionUtils.isEmpty(sessionUser.getRoles())
+                && sessionUser.getRoles().contains(SUPER_ADMIN_ROLE_KEY)) {
             return;
         }
         if (CollectionUtils.isEmpty(sessionUser.getPermissions())

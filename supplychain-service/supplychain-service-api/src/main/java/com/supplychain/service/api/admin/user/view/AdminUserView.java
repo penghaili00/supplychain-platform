@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 后台用户视图
@@ -46,4 +47,19 @@ public class AdminUserView implements Serializable {
      * 状态，1 启用，0 禁用
      */
     private Integer status;
+
+    /**
+     * 角色 ID 集合
+     */
+    private List<Long> roleIds;
+
+    /**
+     * 角色编码集合
+     */
+    private List<String> roleKeys;
+
+    /**
+     * 角色名称集合
+     */
+    private List<String> roleNames;
 }

@@ -1,17 +1,17 @@
-package com.supplychain.service.api.admin.user.query;
+package com.supplychain.service.api.rbac.role.query;
 
 import lombok.Data;
 
 import java.io.Serializable;
 
 /**
- * 后台用户查询条件
+ * 角色查询条件
  */
 @Data
-public class AdminUserQuery implements Serializable {
+public class RoleQuery implements Serializable {
 
     /**
-     * 用户名或显示名称关键字
+     * 角色编码或名称关键字
      */
     private String keyword;
 

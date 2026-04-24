@@ -11,6 +11,9 @@ import java.io.Serializable;
 @Data
 public class CustomerAppAccountPasswordCommand implements Serializable {
 
+    /**
+     * 新密码。
+     */
     @NotBlank(message = "密码不能为空")
     private String password;
 }

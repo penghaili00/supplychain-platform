@@ -14,6 +14,11 @@ import lombok.EqualsAndHashCode;
 public class SysMenu extends BaseEntity {
 
     /**
+     * 父级菜单 ID，0 表示顶级菜单
+     */
+    private Long parentId;
+
+    /**
      * 菜单名称
      */
     private String menuName;

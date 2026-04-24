@@ -11,6 +11,9 @@ import java.io.Serializable;
 @Data
 public class CustomerStatusCommand implements Serializable {
 
+    /**
+     * 客户状态。
+     */
     @NotBlank(message = "状态不能为空")
     private String status;
 }

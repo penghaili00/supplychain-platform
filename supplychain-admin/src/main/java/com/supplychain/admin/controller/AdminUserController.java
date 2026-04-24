@@ -2,6 +2,7 @@ package com.supplychain.admin.controller;
 
 import com.supplychain.common.core.annotation.OperationLog;
 import com.supplychain.common.core.annotation.RequirePermission;
+import com.supplychain.common.core.domain.PageResult;
 import com.supplychain.common.core.domain.R;
 import com.supplychain.common.core.domain.SessionUser;
 import com.supplychain.common.core.enums.OperationType;
@@ -23,8 +24,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 public class AdminUserController {
@@ -35,7 +34,7 @@ public class AdminUserController {
     @GetMapping("/admin/users")
     @RequirePermission("sys:user:list")
     @OperationLog(title = "查询后台用户", businessType = OperationType.QUERY)
-    public R<List<AdminUserView>> list(AdminUserQuery query) {
+    public R<PageResult<AdminUserView>> list(AdminUserQuery query) {
         return R.ok(adminUserDubboService.listUsers(currentUser(), query));
     }
 

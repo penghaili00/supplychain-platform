@@ -1,14 +1,15 @@
 package com.supplychain.service.api.customer.query;
 
+import com.supplychain.common.core.domain.PageQuery;
 import lombok.Data;
-
-import java.io.Serializable;
+import lombok.EqualsAndHashCode;
 
 /**
  * 客户查询条件。
  */
 @Data
-public class CustomerQuery implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class CustomerQuery extends PageQuery {
 
     /**
      * 客户编码或客户名称关键字。

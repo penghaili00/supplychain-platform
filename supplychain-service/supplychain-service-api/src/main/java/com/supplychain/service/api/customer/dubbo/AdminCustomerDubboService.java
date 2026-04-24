@@ -1,5 +1,6 @@
 package com.supplychain.service.api.customer.dubbo;
 
+import com.supplychain.common.core.domain.PageResult;
 import com.supplychain.common.core.domain.SessionUser;
 import com.supplychain.service.api.customer.command.CustomerAddressCreateCommand;
 import com.supplychain.service.api.customer.command.CustomerAddressUpdateCommand;
@@ -19,7 +20,7 @@ import java.util.List;
 
 public interface AdminCustomerDubboService {
 
-    List<CustomerView> listCustomers(SessionUser requester, CustomerQuery query);
+    PageResult<CustomerView> listCustomers(SessionUser requester, CustomerQuery query);
 
     CustomerDetailView getCustomer(SessionUser requester, Long customerId);
 

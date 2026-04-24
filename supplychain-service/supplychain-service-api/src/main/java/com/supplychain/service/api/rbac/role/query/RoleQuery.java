@@ -1,14 +1,15 @@
 package com.supplychain.service.api.rbac.role.query;
 
+import com.supplychain.common.core.domain.PageQuery;
 import lombok.Data;
-
-import java.io.Serializable;
+import lombok.EqualsAndHashCode;
 
 /**
  * 角色查询条件
  */
 @Data
-public class RoleQuery implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class RoleQuery extends PageQuery {
 
     /**
      * 角色编码或名称关键字

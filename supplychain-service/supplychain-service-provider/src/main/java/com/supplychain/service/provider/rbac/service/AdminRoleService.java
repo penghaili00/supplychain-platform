@@ -2,6 +2,8 @@ package com.supplychain.service.provider.rbac.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.supplychain.common.core.domain.PageResult;
 import com.supplychain.common.core.enums.DataScopeType;
 import com.supplychain.common.core.exception.BizException;
 import com.supplychain.service.api.rbac.role.command.RoleCreateCommand;
@@ -36,7 +38,7 @@ public class AdminRoleService {
     private final SysMenuMapper sysMenuMapper;
     private final SysRoleMenuMapper sysRoleMenuMapper;
 
-    public List<RoleView> listRoles(RoleQuery query) {
+    public PageResult<RoleView> listRoles(RoleQuery query) {
         LambdaQueryWrapper<SysRole> wrapper = Wrappers.lambdaQuery(SysRole.class);
         wrapper.eq(SysRole::getDeleted, 0);
         if (query != null && StringUtils.hasText(query.getKeyword())) {
@@ -49,7 +51,12 @@ public class AdminRoleService {
             wrapper.eq(SysRole::getStatus, query.getStatus());
         }
         wrapper.orderByAsc(SysRole::getId);
-        return toViews(sysRoleMapper.selectList(wrapper));
+        Page<SysRole> page = buildPage(query);
+        Page<SysRole> result = sysRoleMapper.selectPage(page, wrapper);
+        return PageResult.<RoleView>builder()
+                .records(toViews(result.getRecords()))
+                .total(result.getTotal())
+                .build();
     }
 
     public RoleView getRole(Long roleId) {
@@ -122,7 +129,7 @@ public class AdminRoleService {
                 .distinct()
                 .toList();
         Map<Long, SysMenu> menuMap = CollectionUtils.isEmpty(menuIds) ? Map.of()
-                : sysMenuMapper.selectBatchIds(menuIds).stream()
+                : sysMenuMapper.selectByIds(menuIds).stream()
                 .filter(Objects::nonNull)
                 .filter(menu -> menu.getDeleted() == null || menu.getDeleted() == 0)
                 .collect(Collectors.toMap(SysMenu::getId, Function.identity()));
@@ -157,6 +164,15 @@ public class AdminRoleService {
         return role;
     }
 
+    private Page<SysRole> buildPage(RoleQuery query) {
+        long pageNum = query == null || query.getPageNum() == null ? 1L : query.getPageNum();
+        long pageSize = query == null || query.getPageSize() == null ? 20L : query.getPageSize();
+        if (pageNum <= 0 || pageSize <= 0) {
+            throw new BizException(400, "分页参数不合法");
+        }
+        return new Page<>(pageNum, pageSize);
+    }
+
     private void syncRoleMenus(Long roleId, List<Long> menuIds) {
         validatePositiveId(roleId, "角色ID");
         List<Long> normalizedMenuIds = normalizeIds(menuIds, "菜单ID");
@@ -187,7 +203,7 @@ public class AdminRoleService {
         if (CollectionUtils.isEmpty(menuIds)) {
             return;
         }
-        List<SysMenu> menus = sysMenuMapper.selectBatchIds(menuIds).stream()
+        List<SysMenu> menus = sysMenuMapper.selectByIds(menuIds).stream()
                 .filter(Objects::nonNull)
                 .filter(menu -> menu.getDeleted() == null || menu.getDeleted() == 0)
                 .toList();

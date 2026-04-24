@@ -2,6 +2,7 @@ package com.supplychain.admin.controller;
 
 import com.supplychain.common.core.annotation.OperationLog;
 import com.supplychain.common.core.annotation.RequirePermission;
+import com.supplychain.common.core.domain.PageResult;
 import com.supplychain.common.core.domain.R;
 import com.supplychain.common.core.enums.OperationType;
 import com.supplychain.service.api.rbac.role.command.RoleCreateCommand;
@@ -20,8 +21,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 public class AdminRoleController {
@@ -32,7 +31,7 @@ public class AdminRoleController {
     @GetMapping("/admin/roles")
     @RequirePermission("sys:role:list")
     @OperationLog(title = "查询角色列表", businessType = OperationType.QUERY)
-    public R<List<RoleView>> list(RoleQuery query) {
+    public R<PageResult<RoleView>> list(RoleQuery query) {
         return R.ok(adminRoleDubboService.listRoles(query));
     }
 

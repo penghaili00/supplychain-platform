@@ -1,5 +1,6 @@
 package com.supplychain.service.provider.customer.dubbo;
 
+import com.supplychain.common.core.domain.PageResult;
 import com.supplychain.common.core.domain.SessionUser;
 import com.supplychain.service.api.customer.command.CustomerAddressCreateCommand;
 import com.supplychain.service.api.customer.command.CustomerAddressUpdateCommand;
@@ -28,7 +29,7 @@ public class AdminCustomerDubboServiceImpl implements AdminCustomerDubboService 
     private final CustomerAdminService customerAdminService;
 
     @Override
-    public List<CustomerView> listCustomers(SessionUser requester, CustomerQuery query) {
+    public PageResult<CustomerView> listCustomers(SessionUser requester, CustomerQuery query) {
         return customerAdminService.listCustomers(requester, query);
     }
 

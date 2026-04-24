@@ -12,6 +12,11 @@ import java.io.Serializable;
 public class MenuUpdateCommand implements Serializable {
 
     /**
+     * 父级菜单 ID，0 表示顶级菜单
+     */
+    private Long parentId;
+
+    /**
      * 菜单名称
      */
     @NotBlank(message = "菜单名称不能为空")

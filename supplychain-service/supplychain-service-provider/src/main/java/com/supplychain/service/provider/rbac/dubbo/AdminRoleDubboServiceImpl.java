@@ -1,5 +1,6 @@
 package com.supplychain.service.provider.rbac.dubbo;
 
+import com.supplychain.common.core.domain.PageResult;
 import com.supplychain.service.api.rbac.role.command.RoleCreateCommand;
 import com.supplychain.service.api.rbac.role.command.RoleUpdateCommand;
 import com.supplychain.service.api.rbac.role.dubbo.AdminRoleDubboService;
@@ -9,8 +10,6 @@ import com.supplychain.service.provider.rbac.service.AdminRoleService;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
 
-import java.util.List;
-
 @DubboService
 @RequiredArgsConstructor
 public class AdminRoleDubboServiceImpl implements AdminRoleDubboService {
@@ -18,7 +17,7 @@ public class AdminRoleDubboServiceImpl implements AdminRoleDubboService {
     private final AdminRoleService adminRoleService;
 
     @Override
-    public List<RoleView> listRoles(RoleQuery query) {
+    public PageResult<RoleView> listRoles(RoleQuery query) {
         return adminRoleService.listRoles(query);
     }
 

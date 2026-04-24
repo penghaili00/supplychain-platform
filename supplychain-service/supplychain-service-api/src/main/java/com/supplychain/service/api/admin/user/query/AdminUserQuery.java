@@ -1,14 +1,15 @@
 package com.supplychain.service.api.admin.user.query;
 
+import com.supplychain.common.core.domain.PageQuery;
 import lombok.Data;
-
-import java.io.Serializable;
+import lombok.EqualsAndHashCode;
 
 /**
  * 后台用户查询条件
  */
 @Data
-public class AdminUserQuery implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class AdminUserQuery extends PageQuery {
 
     /**
      * 用户名或显示名称关键字

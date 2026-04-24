@@ -2,6 +2,8 @@ package com.supplychain.service.provider.customer.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.supplychain.common.core.domain.PageResult;
 import com.supplychain.common.core.domain.SessionUser;
 import com.supplychain.common.core.enums.CodeEnum;
 import com.supplychain.common.core.enums.common.EnableStatus;
@@ -67,7 +69,7 @@ public class CustomerAdminService {
     private final AppUserRoleMapper appUserRoleMapper;
     private final AppPasswordHasher appPasswordHasher;
 
-    public List<CustomerView> listCustomers(SessionUser requester, CustomerQuery query) {
+    public PageResult<CustomerView> listCustomers(SessionUser requester, CustomerQuery query) {
         LambdaQueryWrapper<Customer> wrapper = Wrappers.lambdaQuery(Customer.class);
         wrapper.eq(Customer::getDeleted, 0);
         if (query != null && StringUtils.hasText(query.getKeyword())) {
@@ -79,7 +81,12 @@ public class CustomerAdminService {
             wrapper.eq(Customer::getStatus, resolveEnableStatusCode(query.getStatus(), "客户状态"));
         }
         wrapper.orderByAsc(Customer::getId);
-        return toCustomerViews(customerMapper.selectList(wrapper));
+        Page<Customer> page = buildPage(query);
+        Page<Customer> result = customerMapper.selectPage(page, wrapper);
+        return PageResult.<CustomerView>builder()
+                .records(toCustomerViews(result.getRecords()))
+                .total(result.getTotal())
+                .build();
     }
 
     public CustomerDetailView getCustomer(SessionUser requester, Long customerId) {
@@ -605,6 +612,15 @@ public class CustomerAdminService {
             throw new BizException(404, "客户不存在");
         }
         return customer;
+    }
+
+    private Page<Customer> buildPage(CustomerQuery query) {
+        long pageNum = query == null || query.getPageNum() == null ? 1L : query.getPageNum();
+        long pageSize = query == null || query.getPageSize() == null ? 20L : query.getPageSize();
+        if (pageNum <= 0 || pageSize <= 0) {
+            throw new BizException(400, "分页参数不合法");
+        }
+        return new Page<>(pageNum, pageSize);
     }
 
     private CustomerContact getRequiredContact(Long customerId, Long contactId) {

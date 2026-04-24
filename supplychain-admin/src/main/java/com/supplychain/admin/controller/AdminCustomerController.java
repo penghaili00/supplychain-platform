@@ -2,6 +2,7 @@ package com.supplychain.admin.controller;
 
 import com.supplychain.common.core.annotation.OperationLog;
 import com.supplychain.common.core.annotation.RequirePermission;
+import com.supplychain.common.core.domain.PageResult;
 import com.supplychain.common.core.domain.R;
 import com.supplychain.common.core.domain.SessionUser;
 import com.supplychain.common.core.enums.OperationType;
@@ -47,7 +48,7 @@ public class AdminCustomerController {
     @GetMapping("/admin/customers")
     @RequirePermission("customer:customer:list")
     @OperationLog(title = "查询客户列表", businessType = OperationType.QUERY)
-    public R<List<CustomerView>> list(CustomerQuery query) {
+    public R<PageResult<CustomerView>> list(CustomerQuery query) {
         return R.ok(adminCustomerDubboService.listCustomers(currentUser(), query));
     }
 

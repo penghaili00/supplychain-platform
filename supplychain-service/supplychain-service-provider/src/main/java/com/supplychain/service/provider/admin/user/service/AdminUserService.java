@@ -2,6 +2,8 @@ package com.supplychain.service.provider.admin.user.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.supplychain.common.core.domain.PageResult;
 import com.supplychain.common.core.domain.SessionUser;
 import com.supplychain.common.core.exception.BizException;
 import com.supplychain.common.core.enums.UserType;
@@ -41,7 +43,7 @@ public class AdminUserService {
     private final DataScopeSqlSupport dataScopeSqlSupport;
     private final PasswordEncoder passwordEncoder;
 
-    public List<AdminUserView> listUsers(SessionUser requester, AdminUserQuery query) {
+    public PageResult<AdminUserView> listUsers(SessionUser requester, AdminUserQuery query) {
         LambdaQueryWrapper<SysUser> wrapper = Wrappers.lambdaQuery(SysUser.class);
         wrapper.eq(SysUser::getDeleted, 0);
         if (query != null && StringUtils.hasText(query.getKeyword())) {
@@ -55,7 +57,12 @@ public class AdminUserService {
         }
         dataScopeSqlSupport.apply(wrapper, requester, SysUser::getDeptId, SysUser::getId, SysUser::getDeptAncestors);
         wrapper.orderByAsc(SysUser::getId);
-        return toViews(sysUserMapper.selectList(wrapper));
+        Page<SysUser> page = buildPage(query);
+        Page<SysUser> result = sysUserMapper.selectPage(page, wrapper);
+        return PageResult.<AdminUserView>builder()
+                .records(toViews(result.getRecords()))
+                .total(result.getTotal())
+                .build();
     }
 
     public AdminUserView getUser(SessionUser requester, Long userId) {
@@ -137,7 +144,7 @@ public class AdminUserService {
                 .distinct()
                 .toList();
         Map<Long, SysRole> roleMap = CollectionUtils.isEmpty(roleIds) ? Map.of()
-                : sysRoleMapper.selectBatchIds(roleIds).stream()
+                : sysRoleMapper.selectByIds(roleIds).stream()
                 .filter(Objects::nonNull)
                 .filter(role -> role.getDeleted() == null || role.getDeleted() == 0)
                 .collect(Collectors.toMap(SysRole::getId, Function.identity()));
@@ -182,6 +189,15 @@ public class AdminUserService {
         return user;
     }
 
+    private Page<SysUser> buildPage(AdminUserQuery query) {
+        long pageNum = query == null || query.getPageNum() == null ? 1L : query.getPageNum();
+        long pageSize = query == null || query.getPageSize() == null ? 20L : query.getPageSize();
+        if (pageNum <= 0 || pageSize <= 0) {
+            throw new BizException(400, "分页参数不合法");
+        }
+        return new Page<>(pageNum, pageSize);
+    }
+
     private void syncUserRoles(Long userId, List<Long> roleIds) {
         validatePositiveId(userId, "用户ID");
         List<Long> normalizedRoleIds = normalizeIds(roleIds, "角色ID");
@@ -209,7 +225,7 @@ public class AdminUserService {
         if (CollectionUtils.isEmpty(roleIds)) {
             return;
         }
-        List<SysRole> roles = sysRoleMapper.selectBatchIds(roleIds).stream()
+        List<SysRole> roles = sysRoleMapper.selectByIds(roleIds).stream()
                 .filter(Objects::nonNull)
                 .filter(role -> role.getDeleted() == null || role.getDeleted() == 0)
                 .toList();

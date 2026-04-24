@@ -11,6 +11,9 @@ import java.io.Serializable;
 @Data
 public class CustomerAppAccountStatusCommand implements Serializable {
 
+    /**
+     * 账号状态，1 启用，0 禁用。
+     */
     @NotNull(message = "状态不能为空")
     private Integer status;
 }
